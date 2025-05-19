@@ -1,0 +1,5 @@
+*.xlsx
+*.csv
+.venv/
+.DS_Store
+paths.py
