@@ -76,3 +76,110 @@ def get_half_year_info(today: date = None):
         'prev_start': prev_start,
         'prev_end': prev_end
     }
+
+
+
+
+def assign_sources(aa,column):
+
+    aa['SOURCE'] = ""
+
+    ## Amazon
+    aa.loc[(aa[column].str[3:]=='921am'),"SOURCE"] = 'Amazon'
+    ## AWIN
+    aa.loc[(aa[column].str[3:6]=='929'),"SOURCE"] = 'AWIN'
+    ## Blätterkatalog
+    aa.loc[(aa[column].str[3:6]=='938'),"SOURCE"] = 'Blätterkatalog'
+    ## Corporate Benefits
+    aa.loc[(aa[column].str[3:6]=='943'),"SOURCE"] = 'Corporate Benefits'
+    ## Genussmagazin
+    aa.loc[(aa[column].str.contains(r'936gm|925gm',case=False,regex=True,na=False)),"SOURCE"] = 'Genussmagazin'
+    ## Google Shopping
+    aa.loc[(aa[column].str.contains(r'926gs|924gs',case=False,regex=True,na=False)),"SOURCE"] = 'Google Shopping'
+    ## Internet Import
+    aa.loc[(aa[column].str.contains(r'20i|INT',case=False,regex=True,na=False)),"SOURCE"] = 'Internet Import'
+    ## Inventur Trost
+    aa.loc[(aa[column].str[3:]=='022iv'),"SOURCE"] = 'Inventur Trost'
+    ## Lionshome
+    aa.loc[(aa[column].str[3:]=='921lh'),"SOURCE"] = 'Lionshome'
+    ## Newsletter
+    aa.loc[(aa[column].str[3:6]=='923'),"SOURCE"] = 'Newsletter'
+    ## Newsletter Angebot
+    aa.loc[(aa[column].str[3:]=='923na'),"SOURCE"] = 'Newsletter Angebot'
+    ## Newsletter Rezept
+    aa.loc[(aa[column].str[3:]=='923nr'),"SOURCE"] = 'Newsletter Rezept'
+    ## Newsletter Thema
+    aa.loc[(aa[column].str[3:]=='923nt'),"SOURCE"] = 'Newsletter Thema'
+    ## Otto
+    aa.loc[(aa[column].str[3:]=='921ot'),"SOURCE"] = 'Otto'
+    ## Google SEA
+    aa.loc[(aa[column].str[3:6]=='926'),"SOURCE"] = 'Google SEA'
+    ## SEA Brand
+    aa.loc[(aa[column].str[3:]=='926br'),"SOURCE"] = 'SEA Brand'
+    ## SEA Non-Brand
+    aa.loc[(aa[column].str[3:]=='926sa'),"SOURCE"] = 'SEA Non-Brand'
+    ## SEO
+    aa.loc[(aa[column].str[3:6]=='927'),"SOURCE"] = 'SEO'
+    ## SEO Brand
+    aa.loc[(aa[column].str[3:]=='927br'),"SOURCE"] = 'SEO Brand'
+    ## SEO Non-Brand
+    aa.loc[(aa[column].str[3:]=='927so'),"SOURCE"] = 'SEO Non-Brand'
+    ## Social Media
+    aa.loc[(aa[column].str[3:6]=='925'),"SOURCE"] = 'Social Media'
+    ## Pinterest
+    aa.loc[(aa[column].str.contains(r'925pi|925pt|932aa|pinterest',regex=True,case=False,na=False)),"SOURCE"] = 'Pinterest'
+    ## Instagram
+    aa.loc[(aa[column].str.contains(r'925ig',regex=True,case=False,na=False)),"SOURCE"] = 'Instagram'
+    ## Facebook
+    aa.loc[(aa[column].str.contains(r'925fb',regex=True,case=False,na=False)),"SOURCE"] = 'Facebook'
+    ## Sovendus
+    aa.loc[(aa[column].str.contains(r'928so|sov',regex=True,case=False,na=False)),"SOURCE"] = 'Sovendus'
+
+
+    ## Fremdadressen
+    aa.loc[(aa[column].str[3].isin(['1', '2', '3', '4'])) & (aa[column].str[4:6].isin(['01'])),"SOURCE"] = 'Fremdadressen'
+    ## Katalog und Karte
+    aa.loc[(aa[column].str[3].isin(['1', '2', '3', '4'])) & (aa[column].str[4:6].isin(['02', '03', '04'])),"SOURCE"] = 'Katalog und Karte'
+    ## Beilage
+    aa.loc[(aa[column].str[3:6].isin(['011', '012', '013'])),"SOURCE"] = 'Beilage'
+    aa.loc[(aa[column].str[3:6].isin(['040'])),"SOURCE"] = 'Beilage'
+    ## Geburtstagskarte
+    aa.loc[(aa[column].str[3:6]=='060'),"SOURCE"] = 'Geburtstagskarte'
+    ## Kataloganforderung
+    aa.loc[(aa[column].str[3:6]=='000'),"SOURCE"] = 'Kataloganforderung'
+    ## Freundschaftswerbung
+    aa.loc[(aa[column].str[3:6]=='030'),"SOURCE"] = 'Freundschaftswerbung'
+    ## Mailing
+    aa.loc[(aa[column].str[3:6]=='014'),"SOURCE"] = 'Mailing'
+    ## Blackweek
+    aa.loc[(aa[column].str[3:6]=='016'),"SOURCE"] = 'Blackweek'
+    ## Altcode
+    aa.loc[(aa['SOURCE']==''), 'SOURCE'] = 'Altcode'
+
+    aa["ON-OFF"] = ""
+    ## SOURCE -> Online/Offline
+    aa.loc[aa['SOURCE'].isin(['Amazon','AWIN','Blätterkatalog','Corporate Benefits','Genussmagazin','Google Shopping','Internet Import','Inventur Trost','Lionshome',
+        'Otto','Google SEA','SEA Brand','SEA Non-Brand','SEO','SEO Brand','SEO Non-Brand', 'Social Media','Pinterest','Instagram','Facebook','Sovendus']),'ON-OFF'] = 'Online'
+    aa.loc[aa['SOURCE'].isin(['Newsletter','Newsletter Angebot','Newsletter Rezept','Newsletter Thema']),'ON-OFF'] = 'Newsletter'
+    aa.loc[aa['SOURCE'].isin(['Fremdadressen','Katalog und Karte','Beilage','Geburtstagskarte','Kataloganforderung','Freundschaftswerbung','Mailing','Blackweek']),'ON-OFF'] = 'Offline'
+    aa.loc[aa['SOURCE'].isin(['Altcode']),'ON-OFF'] = 'Altcode'
+    return aa
+
+
+herkunft = { '1':'Schriftlich','2':'Fax','3':'Telefon','4':'Internet','5':'Call-Center',
+    '6':'Ladenverkauf','7':'Vertreter','8':'E-Mail','9':'Anrufbeantworter/Mailbox',
+    'B':'Beleglesung', 'E':'Marktplätze','F':'Amazon-Fulfillment','M':'Messe','S':'SMS','nan':'Ohne/Unbekannt'}
+
+
+anrede = {
+    '1': 'Herrn', '2': 'Frau', '3': 'Frau/Herr', '4': 'Firma', '5': 'Leer(Firmenadresse)', 
+    '6': 'Fräulein', '7': 'Familie', 'X': 'Divers'
+}
+
+def process_anrede(value):
+    value = str(value)
+    if value.startswith('0'):  # Remove leading zeros for numeric values
+        return value.replace('0', '')
+    if value.endswith('.0'):  # Remove '.0' suffix
+        return value.replace('.0', '')
+    return value  # Return non-numeric values as they are
